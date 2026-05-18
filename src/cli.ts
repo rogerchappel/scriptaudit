@@ -20,7 +20,7 @@ program
   .option("--format <format>", "output format: markdown or json", "markdown")
   .option("--out <path>", "write report to a file")
   .option("--config <path>", "config file path, relative to root")
-  .option("--fail-on <risk>", "exit non-zero when this risk or higher is present")
+  .option("--fail-on <risk>", "exit non-zero when this risk or higher is present (caution, dangerous, high)")
   .action(async (rootArg: string, options: ScanCommandOptions) => {
     const root = path.resolve(process.cwd(), rootArg);
     const format = parseFormat(options.format);
@@ -35,7 +35,8 @@ program
       process.stdout.write(output);
     }
 
-    if (options.failOn && shouldFail(report.summary, options.failOn)) {
+    const failOn = options.failOn ? parseRiskThreshold(options.failOn) : undefined;
+    if (failOn && shouldFail(report.summary, failOn)) {
       throw new Error(`Risk threshold met: ${options.failOn}`);
     }
   });
@@ -54,7 +55,7 @@ interface ScanCommandOptions {
   format: string;
   out?: string;
   config?: string;
-  failOn?: RiskLevel;
+  failOn?: string;
 }
 
 function parseFormat(format: string): OutputFormat {
@@ -68,6 +69,16 @@ function shouldFail(summary: Record<RiskLevel, number>, failOn: RiskLevel): bool
   const order: RiskLevel[] = ["safe", "unknown", "caution", "dangerous"];
   const threshold = order.indexOf(failOn);
   return order.slice(threshold).some((risk) => summary[risk] > 0);
+}
+
+function parseRiskThreshold(value: string): RiskLevel {
+  if (value === "high") return "dangerous";
+  if (value === "medium") return "caution";
+  if (value === "low") return "unknown";
+  if (value === "safe" || value === "unknown" || value === "caution" || value === "dangerous") {
+    return value;
+  }
+  throw new Error(`Unsupported risk threshold: ${value}`);
 }
 
 program.parseAsync(process.argv).catch((error: unknown) => {
