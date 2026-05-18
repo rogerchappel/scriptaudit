@@ -1,0 +1,20 @@
+{
+  "project": "scriptaudit",
+  "factoryRun": "2026-05-18 PM",
+  "ownedPath": "/Users/roger/Developer/my-opensource/scriptaudit",
+  "github": "rogerchappel/scriptaudit",
+  "commands": {
+    "test": "npm test",
+    "check": "npm run check",
+    "build": "npm run build",
+    "smoke": "npm run smoke",
+    "validate": "bash scripts/validate.sh",
+    "fixtureSmoke": "node dist/cli.js scan examples/fixtures/risky --format json --fail-on high"
+  },
+  "safety": {
+    "executesTargetScripts": false,
+    "network": false,
+    "telemetry": false
+  },
+  "outputs": ["markdown", "json"]
+}
