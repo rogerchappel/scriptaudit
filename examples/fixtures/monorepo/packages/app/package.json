@@ -1,0 +1,8 @@
+{
+  "name": "@fixture/app",
+  "private": true,
+  "scripts": {
+    "check": "tsc --noEmit",
+    "deploy": "flyctl deploy"
+  }
+}
