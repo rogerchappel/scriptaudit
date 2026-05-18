@@ -3,7 +3,7 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { initConfig } from "../dist/init.js";
+import { initConfig } from "../dist/index.js";
 
 test("init writes oss cli config", async () => {
   const dir = await mkdtemp(path.join(tmpdir(), "scriptaudit-init-"));
