@@ -1,0 +1,10 @@
+{
+  "name": "clean-fixture",
+  "private": true,
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "node --test",
+    "build": "tsc",
+    "smoke": "node dist/index.js --help"
+  }
+}
