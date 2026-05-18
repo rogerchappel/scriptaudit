@@ -1,0 +1,9 @@
+{
+  "name": "config-override-fixture",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf dist",
+    "publish:dry": "npm publish --dry-run",
+    "verify": "npm run clean && npm test"
+  }
+}
