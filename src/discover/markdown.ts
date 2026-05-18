@@ -1,12 +1,11 @@
 import path from "node:path";
-import { findFiles, readText, toPosixRelative } from "../files.js";
+import { findFilesByExtension, readText, toPosixRelative } from "../files.js";
 import type { CommandSource } from "../types.js";
 
-const MARKDOWN_NAMES = new Set(["README.md", "CONTRIBUTING.md", "SECURITY.md", "TASKS.md", "ORCHESTRATION.md"]);
 const COMMAND_PREFIX = /^(?:\$\s*)?(npm|pnpm|yarn|node|npx|bash|sh|make|just|task|deno|bun|tsx)\b/;
 
 export async function discoverMarkdownCommands(root: string): Promise<CommandSource[]> {
-  const files = await findFiles(root, MARKDOWN_NAMES);
+  const files = await findFilesByExtension(root, ".md");
   const commands: CommandSource[] = [];
 
   for (const filePath of files) {
