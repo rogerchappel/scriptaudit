@@ -2,57 +2,34 @@
 
 ## Supported Versions
 
-Replace this section with the supported versions for `/Users/roger/Developer/my-opensource/scriptaudit`.
+ScriptAudit is pre-1.0. Security fixes are handled on the latest `main` branch until versioned releases begin.
 
-Example:
-
-```md
 | Version | Supported |
 | --- | --- |
-| .x | Yes |
-| < .0 | No |
-```
-
-If the project does not publish versioned releases yet, say that clearly.
+| `main` | Yes |
+| `< 0.1.0` | No |
 
 ## Reporting a Vulnerability
 
-Please do not report suspected vulnerabilities in public issues, pull requests, or discussions.
+Do not include exploit details, secrets, personal data, or sensitive repository contents in public issues.
 
-Ask maintainers for the private security reporting path before sharing details.
-
-If no private reporting path exists yet, ask maintainers through public project channels for a private reporting path. Do not include exploit details, secrets, personal data, or sensitive technical details in public messages.
-
-## What to Include
-
-When a private reporting path is available, include:
-
-- A clear description of the issue.
-- Affected versions, files, packages, workflows, or configuration.
-- Steps to reproduce, proof of concept, or attack scenario when safe to share.
-- Potential impact.
-- Suggested mitigation, if known.
-
-## Response Expectations
-
-Maintainers review good-faith reports as capacity allows.
-
-Do not imply paid support, guaranteed response times, guaranteed fixes, or service-level agreements unless `/Users/roger/Developer/my-opensource/scriptaudit` explicitly provides them.
+Use GitHub private vulnerability reporting when available. If private reporting is not available, open a public issue asking for a private contact path without technical details.
 
 ## Scope
 
 In scope:
 
-- Vulnerabilities in /Users/roger/Developer/my-opensource/scriptaudit.
-- Insecure default configuration shipped by this project.
-- CI, release, or dependency guidance maintained by this project.
+- Bugs that cause ScriptAudit to execute target project commands.
+- Report generation behavior that leaks data outside the scanned working tree.
+- Unsafe defaults in config initialization, CI, or release guidance.
+- Dependency vulnerabilities that affect normal CLI use.
 
 Out of scope:
 
-- General support requests.
-- Requests for guaranteed maintenance timelines.
-- Issues in unrelated downstream projects.
+- A target repository containing inherently dangerous scripts.
+- Heuristic misclassification without a security impact.
+- Requests for guaranteed response or maintenance timelines.
 
-## Disclosure
+## Safety Model
 
-Coordinate disclosure with maintainers before publishing vulnerability details.
+ScriptAudit is a static analyzer. It reads files and writes reports only when requested. It does not run discovered target commands, call LLM services, send telemetry, or make network requests during scanning.
