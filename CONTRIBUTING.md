@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve `/Users/roger/Developer/my-opensource/scriptaudit`.
+Thanks for helping improve ScriptAudit.
 
 This project values small, reviewable contributions with clear verification.
 
@@ -9,7 +9,7 @@ This project values small, reviewable contributions with clear verification.
 Before opening an issue:
 
 - Search existing issues.
-- Confirm the issue applies to `/Users/roger/Developer/my-opensource/scriptaudit`.
+- Confirm the issue applies to ScriptAudit.
 - Include enough context for maintainers to understand or reproduce the request.
 
 Bug reports should include:
@@ -66,6 +66,7 @@ Every contribution should include verification.
 
 Examples:
 
+- CLI changes: run `npm test`, `npm run check`, and `npm run smoke`.
 - Documentation: inspect rendered Markdown or review the diff.
 - Tests: run the targeted test command.
 - Types: run the project typecheck.
