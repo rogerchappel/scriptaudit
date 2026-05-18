@@ -24,3 +24,8 @@ test("scans monorepo package scripts", async () => {
   assert.ok(report.commands.some((command) => command.workspace === "@fixture/app"));
   assert.ok(report.commands.some((command) => command.kind === "npm-workspace"));
 });
+
+test("scans nested markdown docs", async () => {
+  const report = await scanProject({ root: fixture("docs-only") });
+  assert.ok(report.commands.some((command) => command.location.file === "docs/runbook.md"));
+});
