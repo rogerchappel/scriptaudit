@@ -1,0 +1,12 @@
+{
+  "name": "agent-cli-fixture",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc --noEmit",
+    "smoke": "node dist/cli.js --help",
+    "clean": "rm -rf dist",
+    "publish:dry": "npm pack --dry-run",
+    "deploy": "wrangler deploy"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "knownSafe": ["publish:dry"],
+  "blocked": ["deploy"],
+  "rules": [
+    {
+      "match": "clean",
+      "risk": "caution",
+      "reason": "Cleanup deletes generated files."
+    }
+  ]
+}
