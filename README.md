@@ -31,6 +31,8 @@ scriptaudit scan examples/fixtures/risky --format json --fail-on dangerous
 scriptaudit init --preset oss-cli
 ```
 
+For a fixture-backed walkthrough, see [`docs/tutorials/audit-agent-cli-scripts.md`](docs/tutorials/audit-agent-cli-scripts.md). It scans a small agent-CLI example and shows how config can mark dry packaging as safe while blocking deployment commands.
+
 ## What It Scans
 
 - `package.json` scripts across the repository.
