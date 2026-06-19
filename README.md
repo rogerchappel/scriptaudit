@@ -92,6 +92,10 @@ npm run smoke
 bash scripts/validate.sh
 ```
 
+## Release readiness
+
+Use [docs/release-readiness.md](docs/release-readiness.md) before opening release PRs or tagging a release.
+
 ## License
 
 MIT
