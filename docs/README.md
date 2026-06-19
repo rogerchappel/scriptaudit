@@ -6,3 +6,7 @@
 - `orchestration.json` gives machine-readable factory metadata.
 
 Generated audit reports can be written here with `scriptaudit scan . --out docs/SCRIPTS.md`.
+
+## Contents
+
+- [Release readiness](release-readiness.md)
