@@ -38,8 +38,8 @@ For a fixture-backed walkthrough, see [`docs/tutorials/audit-agent-cli-scripts.m
 - `package.json` scripts across the repository.
 - `pnpm-workspace.yaml` workspace hints.
 - Makefile targets.
-- README, CONTRIBUTING, SECURITY, TASKS, and ORCHESTRATION fenced shell blocks.
-- Justfile recipes and simple Taskfile commands.
+- README, CONTRIBUTING, SECURITY, TASKS, and ORCHESTRATION shell blocks fenced with backticks or tildes.
+- Justfile recipes and Taskfile `cmds` entries written as scalar commands (`- npm test`) or inline mappings (`- cmd: npm test`).
 
 ## Risk Model
 
