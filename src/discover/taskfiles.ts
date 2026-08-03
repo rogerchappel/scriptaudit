@@ -90,7 +90,8 @@ function collectCommands(lines: string[], start: number): string {
     }
     const match = /^\s*-\s+(.+)$/.exec(lines[index]);
     if (match) {
-      body.push(match[1].trim());
+      const command = /^(?:cmd\s*:\s*)(.+)$/.exec(match[1].trim())?.[1] ?? match[1].trim();
+      body.push(command);
     }
   }
   return body.join(" && ");
