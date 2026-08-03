@@ -29,3 +29,25 @@ test("scans nested markdown docs", async () => {
   const report = await scanProject({ root: fixture("docs-only") });
   assert.ok(report.commands.some((command) => command.location.file === "docs/runbook.md"));
 });
+
+test("scans tilde-fenced shell commands", async () => {
+  const report = await scanProject({ root: fixture("docs-only") });
+  const command = report.commands.find(
+    (candidate) => candidate.kind === "markdown" && candidate.command === "npm publish"
+  );
+
+  assert.equal(command?.location.file, "docs/runbook.md");
+  assert.equal(command?.location.line, 8);
+  assert.equal(command?.risk, "dangerous");
+});
+
+test("scans mapping-form Taskfile commands", async () => {
+  const report = await scanProject({ root: fixture("docs-only") });
+  const command = report.commands.find((candidate) => candidate.kind === "taskfile");
+
+  assert.equal(command?.command, "npm publish");
+  assert.equal(command?.location.file, "Taskfile.yml");
+  assert.equal(command?.location.line, 4);
+  assert.deepEqual(command?.tools, ["npm"]);
+  assert.equal(command?.risk, "dangerous");
+});
