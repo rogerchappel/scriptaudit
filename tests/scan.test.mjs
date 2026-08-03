@@ -37,8 +37,9 @@ test("scans tilde-fenced shell commands", async () => {
   );
 
   assert.equal(command?.location.file, "docs/runbook.md");
-  assert.equal(command?.location.line, 8);
+  assert.equal(command?.location.line, 9);
   assert.equal(command?.risk, "dangerous");
+  assert.ok(!report.commands.some((candidate) => candidate.command.includes("--tag ignored")));
 });
 
 test("scans mapping-form Taskfile commands", async () => {
