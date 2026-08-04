@@ -23,19 +23,29 @@ export async function discoverMarkdownCommands(root: string): Promise<CommandSou
 function extractCodeBlockCommands(relativeFile: string, text: string): CommandSource[] {
   const commands: CommandSource[] = [];
   const lines = text.split(/\r?\n/);
-  let inFence = false;
+  let fenceMarker = "";
   let language = "";
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
-    const fence = /^```\s*([A-Za-z0-9_-]*)/.exec(line);
-    if (fence) {
-      inFence = !inFence;
-      language = inFence ? fence[1].toLowerCase() : "";
-      continue;
+    if (fenceMarker) {
+      const closingFence = /^ {0,3}(`{3,}|~{3,})\s*$/.exec(line);
+      if (closingFence && closingFence[1][0] === fenceMarker[0] && closingFence[1].length >= fenceMarker.length) {
+        fenceMarker = "";
+        language = "";
+        continue;
+      }
+    } else {
+      const openingFence = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+      const info = openingFence?.[2].trim() ?? "";
+      if (openingFence && (openingFence[1][0] !== "`" || !info.includes("`"))) {
+        fenceMarker = openingFence[1];
+        language = (info.split(/\s+/, 1)[0] ?? "").toLowerCase();
+        continue;
+      }
     }
 
-    if (!inFence || (language && !["bash", "sh", "shell", "console", "zsh"].includes(language))) {
+    if (!fenceMarker || (language && !["bash", "sh", "shell", "console", "zsh"].includes(language))) {
       continue;
     }
 
