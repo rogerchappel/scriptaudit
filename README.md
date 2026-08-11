@@ -95,6 +95,7 @@ bash scripts/validate.sh
 ## Release readiness
 
 Use [docs/release-readiness.md](docs/release-readiness.md) before opening release PRs or tagging a release.
+Version tags publish one npm tarball with trusted publishing and provenance, then attach that same tarball to the GitHub release. Pull requests that change release files dry-run publication of the packed artifact.
 
 ## License
 

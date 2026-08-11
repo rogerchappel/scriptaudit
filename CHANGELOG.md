@@ -9,6 +9,10 @@ format and uses semantic versioning when versioned releases are published.
 
 ### Added
 
+- Added verified npm trusted publication with provenance and reuse of the packed artifact in GitHub releases.
+
+- Added a workflow regression check and npm publication dry run for release-related pull requests.
+
 - Added a release-readiness checklist for local verification and package review.
 
 - Initial project setup.
