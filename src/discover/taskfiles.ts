@@ -1,5 +1,6 @@
 import { findFiles, readText, toPosixRelative } from "../files.js";
 import type { CommandSource } from "../types.js";
+import { parse } from "yaml";
 
 const TASK_FILES = new Set(["justfile", "Justfile", "Taskfile.yml", "Taskfile.yaml"]);
 
@@ -47,24 +48,55 @@ function discoverJustfile(file: string, text: string): CommandSource[] {
 
 function discoverTaskfile(file: string, text: string): CommandSource[] {
   const commands: CommandSource[] = [];
-  const lines = text.split(/\r?\n/);
-  for (let index = 0; index < lines.length; index += 1) {
-    const match = /^\s{2}([A-Za-z0-9_-]+):\s*$/.exec(lines[index]);
-    if (!match) {
+  let document: unknown;
+  try {
+    document = parse(text);
+  } catch {
+    return commands;
+  }
+  if (!isRecord(document) || !isRecord(document.tasks)) {
+    return commands;
+  }
+  for (const [name, task] of Object.entries(document.tasks)) {
+    if (!isRecord(task)) {
       continue;
     }
-    const body = collectCommands(lines, index + 1);
+    const body = taskCommands(task.cmds);
     if (body) {
       commands.push({
-        id: `${file}#${match[1]}`,
-        name: match[1],
+        id: `${file}#${name}`,
+        name,
         command: body,
         kind: "taskfile",
-        location: { file, line: index + 1 }
+        location: { file, line: taskLine(text, name) }
       });
     }
   }
   return commands;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function taskCommands(value: unknown): string {
+  const entries = Array.isArray(value) ? value : [value];
+  return entries
+    .map((entry) => {
+      if (typeof entry === "string") return entry.trim();
+      if (isRecord(entry) && typeof entry.cmd === "string") return entry.cmd.trim();
+      return "";
+    })
+    .filter(Boolean)
+    .join(" && ");
+}
+
+function taskLine(text: string, taskName: string): number | undefined {
+  const lines = text.split(/\r?\n/);
+  const escapedName = taskName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(`^\\s{2,}${escapedName}:\\s*(?:#.*)?$`);
+  const index = lines.findIndex((line) => pattern.test(line));
+  return index >= 0 ? index + 1 : undefined;
 }
 
 function collectIndented(lines: string[], start: number): string {
@@ -76,21 +108,6 @@ function collectIndented(lines: string[], start: number): string {
     }
     const command = line.trim();
     if (command && !command.startsWith("#")) {
-      body.push(command);
-    }
-  }
-  return body.join(" && ");
-}
-
-function collectCommands(lines: string[], start: number): string {
-  const body: string[] = [];
-  for (let index = start; index < lines.length; index += 1) {
-    if (/^\s{2}[A-Za-z0-9_-]+:\s*$/.test(lines[index])) {
-      break;
-    }
-    const match = /^\s*-\s+(.+)$/.exec(lines[index]);
-    if (match) {
-      const command = /^(?:cmd\s*:\s*)(.+)$/.exec(match[1].trim())?.[1] ?? match[1].trim();
       body.push(command);
     }
   }
