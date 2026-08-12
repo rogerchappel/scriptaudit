@@ -30,6 +30,20 @@ test("scans nested markdown docs", async () => {
   assert.ok(report.commands.some((command) => command.location.file === "docs/runbook.md"));
 });
 
+test("scans only executable Taskfile commands", async () => {
+  const report = await scanProject({ root: fixture("taskfile-metadata") });
+  const taskCommands = report.commands.filter((command) => command.kind === "taskfile");
+  assert.deepEqual(taskCommands.map(({ name, command }) => ({ name, command })), [
+    { name: "deploy", command: "npm publish" },
+    { name: "verify", command: "npm test && npm run check" }
+  ]);
+  assert.ok(!report.commands.some((command) => command.command.includes("src/**/*.ts")));
+  assert.ok(!report.commands.some((command) => command.command.includes("dev")));
+  assert.deepEqual(report.recommendedSequence.map((step) => step.command), [
+    "npm test && npm run check"
+  ]);
+});
+
 test("scans tilde-fenced shell commands", async () => {
   const report = await scanProject({ root: fixture("docs-only") });
   const command = report.commands.find(

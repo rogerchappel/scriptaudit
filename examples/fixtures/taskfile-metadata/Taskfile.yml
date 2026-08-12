@@ -1,0 +1,21 @@
+version: "3"
+vars:
+  ALLOWED_ENVS: [dev, prod]
+includes:
+  shared: ./Taskfile.shared.yml
+tasks:
+  verify:
+    desc: Run local verification
+    cmds:
+      - npm test
+      - cmd: npm run check
+        silent: true
+    sources: [src/**/*.ts]
+    generates: [dist/**/*.js]
+    deps: [setup]
+    aliases: [check]
+  deploy:
+    cmds:
+      - cmd: npm publish
+  metadata-only:
+    sources: [docs/**/*.md]
