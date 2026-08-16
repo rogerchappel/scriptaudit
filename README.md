@@ -38,8 +38,10 @@ For a fixture-backed walkthrough, see [`docs/tutorials/audit-agent-cli-scripts.m
 - `package.json` scripts across the repository.
 - `pnpm-workspace.yaml` workspace hints.
 - Makefile targets.
-- README, CONTRIBUTING, SECURITY, TASKS, and ORCHESTRATION shell blocks fenced with backticks or tildes.
+- Markdown shell blocks fenced with backticks or tildes and labelled `bash`, `sh`, `shell`, `console`, or `zsh` (unlabelled fences are also scanned). Each independently executable line must begin with a supported command or an optional `$` prompt. Supported commands include package and task runners, Node and shell entry points, plus risk-relevant network, container, version-control, destructive, permission, deploy, and publish tools such as `curl`, `docker`, `git`, `rm`, `sudo`, and `vercel`.
 - Justfile recipes and Taskfile `cmds` entries written as scalar commands (`- npm test`) or inline mappings (`- cmd: npm test`).
+
+Markdown blocks labelled with other languages are deliberately ignored. Prose, comments, command output, continuations that do not start with a supported command, and commands embedded later in a line are not treated as independently executable commands.
 
 ## Risk Model
 

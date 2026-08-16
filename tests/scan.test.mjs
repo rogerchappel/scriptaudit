@@ -30,6 +30,19 @@ test("scans nested markdown docs", async () => {
   assert.ok(report.commands.some((command) => command.location.file === "docs/runbook.md"));
 });
 
+test("scans risk-relevant commands in shell documentation", async () => {
+  const report = await scanProject({ root: fixture("docs-only") });
+  const commands = new Map(report.commands.map((command) => [command.command, command]));
+
+  assert.equal(commands.get("curl https://example.com/status")?.network, true);
+  assert.ok(commands.get("curl https://example.com/status")?.evidence.some(({ code }) => code === "network-tool"));
+  assert.equal(commands.get("docker compose up")?.risk, "caution");
+  assert.deepEqual(commands.get("docker compose up")?.sideEffects, ["container"]);
+  assert.equal(commands.get("sudo chmod 600 .env")?.risk, "dangerous");
+  assert.ok(commands.get("sudo chmod 600 .env")?.evidence.some(({ code }) => code === "permissions"));
+  assert.equal(commands.get("npm test")?.risk, "safe");
+});
+
 test("scans only executable Taskfile commands", async () => {
   const report = await scanProject({ root: fixture("taskfile-metadata") });
   const taskCommands = report.commands.filter((command) => command.kind === "taskfile");
