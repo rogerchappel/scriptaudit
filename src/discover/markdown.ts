@@ -2,7 +2,7 @@ import path from "node:path";
 import { findFilesByExtension, readText, toPosixRelative } from "../files.js";
 import type { CommandSource } from "../types.js";
 
-const COMMAND_PREFIX = /^(?:\$\s*)?(npm|pnpm|yarn|node|npx|bash|sh|make|just|task|deno|bun|tsx)\b/;
+const COMMAND_PREFIX = /^(?:\$\s*)?(?:npm|pnpm|yarn|node|npx|bash|sh|make|just|task|deno|bun|tsx|curl|wget|docker(?:-compose)?|git|gh|rm|sudo|chmod|chown|vercel|flyctl|netlify|changeset)\b/;
 
 export async function discoverMarkdownCommands(root: string): Promise<CommandSource[]> {
   const files = await findFilesByExtension(root, ".md");
