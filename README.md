@@ -71,6 +71,7 @@ Create `scriptaudit.config.json` with:
 ```
 
 Config matching is intentionally simple and deterministic: a pattern matches a command id, script name, or command string.
+An explicitly supplied `--config` path must exist. Config files are validated before scanning: `knownSafe` and `blocked` must be string arrays, while each `rules` entry requires a string `match` and may include a `risk` of `safe`, `caution`, `dangerous`, or `unknown` plus a string `reason`. Invalid files fail with the config path and precise field name.
 
 ## Safety Limits
 
