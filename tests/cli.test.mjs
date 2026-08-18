@@ -24,3 +24,12 @@ test("CLI supports PRD fail-on high alias", () => {
   assert.equal(result.status, 1);
   assert.match(result.stderr, /Risk threshold met: high/);
 });
+
+test("CLI rejects a missing explicitly requested config", () => {
+  const result = spawnSync(process.execPath, [cli, "scan", "examples/fixtures/clean", "--config", "missing.config.json"], {
+    cwd: repo,
+    encoding: "utf8"
+  });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Config file not found: .*missing\.config\.json/);
+});
