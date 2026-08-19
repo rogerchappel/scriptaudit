@@ -31,6 +31,8 @@ scriptaudit scan examples/fixtures/risky --format json --fail-on dangerous
 scriptaudit init --preset oss-cli
 ```
 
+The scan root must exist and be a directory. Invalid roots fail with a nonzero exit and a path-specific diagnostic instead of producing an empty audit. An existing empty directory is valid and produces a successful report with zero commands.
+
 For a fixture-backed walkthrough, see [`docs/tutorials/audit-agent-cli-scripts.md`](docs/tutorials/audit-agent-cli-scripts.md). It scans a small agent-CLI example and shows how config can mark dry packaging as safe while blocking deployment commands.
 
 ## What It Scans
