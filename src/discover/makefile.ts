@@ -17,12 +17,19 @@ export async function discoverMakeTargets(root: string): Promise<CommandSource[]
 
     for (let index = 0; index < lines.length; index += 1) {
       const line = lines[index];
-      const match = /^(?!\t|\s)([A-Za-z0-9_.-]+):(?:\s|$)/.exec(line);
+      const match = /^(?!\t|\s)([A-Za-z0-9_.-]+):(.*)$/.exec(line);
       if (!match || match[1].startsWith(".")) {
         continue;
       }
 
       const body: string[] = [];
+      const separator = match[2].indexOf(";");
+      if (separator !== -1) {
+        const inlineRecipe = match[2].slice(separator + 1).trim();
+        if (inlineRecipe) {
+          body.push(inlineRecipe);
+        }
+      }
       for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
         if (!lines[cursor].startsWith("\t")) {
           break;
