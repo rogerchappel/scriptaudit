@@ -79,3 +79,20 @@ test("scans mapping-form Taskfile commands", async () => {
   assert.deepEqual(command?.tools, ["npm"]);
   assert.equal(command?.risk, "dangerous");
 });
+
+test("scans same-line Makefile recipes with and without prerequisites", async () => {
+  const report = await scanProject({ root: fixture("docs-only") });
+  const makeCommands = new Map(
+    report.commands
+      .filter((candidate) => candidate.kind === "makefile")
+      .map((candidate) => [candidate.name, candidate])
+  );
+
+  assert.equal(makeCommands.get("publish-inline")?.command, "npm publish");
+  assert.equal(makeCommands.get("publish-inline")?.location.file, "Makefile");
+  assert.equal(makeCommands.get("publish-inline")?.location.line, 7);
+  assert.equal(makeCommands.get("publish-inline")?.risk, "dangerous");
+  assert.equal(makeCommands.get("verify-inline")?.command, "npm test");
+  assert.equal(makeCommands.get("verify-inline")?.location.line, 9);
+  assert.equal(makeCommands.get("validate")?.command, "npm run check");
+});
