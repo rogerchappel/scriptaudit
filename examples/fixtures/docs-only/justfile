@@ -1,0 +1,7 @@
+set shell := ["bash", "-cu"]
+
+deploy environment:
+  rm -rf "build/{{environment}}"
+
+verify suite="unit":
+  npm test -- "{{suite}}"

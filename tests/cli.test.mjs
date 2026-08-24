@@ -27,6 +27,16 @@ test("CLI supports PRD fail-on high alias", () => {
   assert.match(result.stderr, /Risk threshold met: high/);
 });
 
+test("CLI fail-on detects dangerous parameterized Just recipes", () => {
+  const result = spawnSync(process.execPath, [cli, "scan", "examples/fixtures/docs-only", "--format", "json", "--fail-on", "dangerous"], {
+    cwd: repo,
+    encoding: "utf8"
+  });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Risk threshold met: dangerous/);
+  assert.equal(JSON.parse(result.stdout).commands.some(({ kind, name }) => kind === "justfile" && name === "deploy"), true);
+});
+
 test("CLI rejects a missing explicitly requested config", () => {
   const result = spawnSync(process.execPath, [cli, "scan", "examples/fixtures/clean", "--config", "missing.config.json"], {
     cwd: repo,
