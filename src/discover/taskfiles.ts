@@ -28,7 +28,7 @@ function discoverJustfile(file: string, text: string): CommandSource[] {
   const commands: CommandSource[] = [];
   const lines = text.split(/\r?\n/);
   for (let index = 0; index < lines.length; index += 1) {
-    const match = /^([A-Za-z0-9_-]+):/.exec(lines[index]);
+    const match = /^([A-Za-z0-9_-]+)(?:\s+[^:=\s][^:]*)?:\s*(?:#.*)?$/.exec(lines[index]);
     if (!match) {
       continue;
     }

@@ -17,8 +17,12 @@ export async function discoverMakeTargets(root: string): Promise<CommandSource[]
 
     for (let index = 0; index < lines.length; index += 1) {
       const line = lines[index];
-      const match = /^(?!\t|\s)([A-Za-z0-9_.-]+):(.*)$/.exec(line);
-      if (!match || match[1].startsWith(".")) {
+      const match = /^([^:=\s][^:=]*):(?![=])(.*)$/.exec(line);
+      if (!match) {
+        continue;
+      }
+      const targets = match[1].trim().split(/\s+/);
+      if (targets.some((target) => !/^[A-Za-z0-9_.-]+$/.test(target) || target.startsWith("."))) {
         continue;
       }
 
@@ -38,16 +42,18 @@ export async function discoverMakeTargets(root: string): Promise<CommandSource[]
       }
 
       if (body.length > 0) {
-        commands.push({
-          id: `${relativeFile}#${match[1]}`,
-          name: match[1],
-          command: body.join(" && "),
-          kind: "makefile",
-          location: {
-            file: relativeFile,
-            line: index + 1
-          }
-        });
+        for (const target of targets) {
+          commands.push({
+            id: `${relativeFile}#${target}`,
+            name: target,
+            command: body.join(" && "),
+            kind: "makefile",
+            location: {
+              file: relativeFile,
+              line: index + 1
+            }
+          });
+        }
       }
     }
   }

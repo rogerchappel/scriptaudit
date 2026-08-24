@@ -96,3 +96,26 @@ test("scans same-line Makefile recipes with and without prerequisites", async ()
   assert.equal(makeCommands.get("verify-inline")?.location.line, 9);
   assert.equal(makeCommands.get("validate")?.command, "npm run check");
 });
+
+test("scans multi-target Make rules and parameterized Just recipes", async () => {
+  const report = await scanProject({ root: fixture("docs-only") });
+  const commands = new Map(report.commands.map((command) => [`${command.kind}:${command.name}`, command]));
+
+  for (const name of ["build", "test"]) {
+    const command = commands.get(`makefile:${name}`);
+    assert.equal(command?.command, "npm test");
+    assert.equal(command?.location.file, "Makefile");
+    assert.equal(command?.location.line, 11);
+    assert.equal(command?.risk, "safe");
+  }
+  assert.equal(commands.has("makefile:export"), false);
+
+  const deploy = commands.get("justfile:deploy");
+  assert.equal(deploy?.command, 'rm -rf "build/{{environment}}"');
+  assert.equal(deploy?.location.file, "justfile");
+  assert.equal(deploy?.location.line, 3);
+  assert.equal(deploy?.risk, "dangerous");
+  assert.equal(commands.get("justfile:verify")?.command, 'npm test -- "{{suite}}"');
+  assert.equal(commands.get("justfile:verify")?.risk, "safe");
+  assert.equal(commands.has("justfile:set"), false);
+});
