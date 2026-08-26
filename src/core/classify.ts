@@ -39,7 +39,7 @@ export function classifyCommand(source: CommandSource, config: AuditConfig = {})
   network = network || /https?:\/\//i.test(source.command);
   const score = evidence.reduce((sum, item) => sum + item.weight, 10);
   const configuredRisk = configuredRiskFor(source, config);
-  const dangerousEvidence = new Set(["destructive-delete", "deploy", "publish", "config-blocked"]);
+  const dangerousEvidence = new Set(["destructive-delete", "deploy", "publish", "permissions", "config-blocked"]);
   const hasDangerousEvidence = evidence.some((item) => dangerousEvidence.has(item.code));
   const risk = configuredRisk ?? (hasDangerousEvidence ? "dangerous" : scoreToRisk(score, evidence.length));
 

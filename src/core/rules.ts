@@ -7,7 +7,7 @@ export interface RuleMatch {
 }
 
 const RULES: Array<{ pattern: RegExp; match: RuleMatch }> = [
-  { pattern: /\brm\s+-rf\b|\brimraf\b|\btrash\b/, match: evidence("destructive-delete", "Deletes files or directories.", 45, "filesystem") },
+  { pattern: /\brm\s+(?:[^\s;&|]+\s+)*-(?:[a-z]*[rf][a-z]*|-[a-z-]*(?:recursive|force)[a-z-]*)\b|\brimraf\b|\btrash\b/, match: evidence("destructive-delete", "Deletes files or directories.", 45, "filesystem") },
   { pattern: /\bdeploy\b|\bvercel\b|\bflyctl\b|\bnetlify\b/, match: evidence("deploy", "Looks like a deployment command.", 50, "external-service", true) },
   { pattern: /\bpublish\b|\bnpm\s+publish\b|\bchangeset\s+publish\b/, match: evidence("publish", "May publish an artifact.", 55, "registry", true) },
   { pattern: /\bcurl\b|\bwget\b|\bnc\b|\bssh\b/, match: evidence("network-tool", "Uses a network-capable tool.", 25, "network", true) },
