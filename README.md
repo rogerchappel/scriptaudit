@@ -56,7 +56,7 @@ Markdown blocks labelled with other languages are deliberately ignored. Prose, c
 
 - `safe`: low-risk local verification such as tests, checks, builds, and smoke commands.
 - `caution`: commands with possible local side effects, generated artifacts, containers, env-file references, or network-capable tools.
-- `dangerous`: destructive cleanup, deploy, publish, permission changes, or policy-blocked commands. Destructive cleanup, deploy, and publish evidence takes precedence when a compound command also runs tests, checks, builds, or smoke validation. An explicit matching config `rules` risk remains the final override.
+- `dangerous`: recursive or forced `rm` cleanup, deploy, publish, privilege/ownership/permission changes, or policy-blocked commands. Destructive cleanup, deploy, and publish evidence takes precedence when a compound command also runs tests, checks, builds, or smoke validation. An explicit matching config `rules` risk remains the final override.
 - `unknown`: commands without enough evidence to recommend confidently.
 
 Each report includes evidence, detected tools, side-effect hints, network hints, and a recommended verification sequence.
