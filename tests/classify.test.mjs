@@ -21,6 +21,33 @@ test("classifies destructive cleanup as dangerous", () => {
   assert.ok(finding.sideEffects.includes("filesystem"));
 });
 
+test("classifies recursive and forced rm variants as dangerous", () => {
+  for (const command of ["rm -r dist", "rm -f artifact", "rm -fr dist", "rm -Rvf dist", "rm --recursive dist", "rm --force artifact"]) {
+    const finding = classifyCommand({ ...base, name: "clean", command });
+    assert.equal(finding.risk, "dangerous", command);
+    assert.deepEqual(finding.evidence, [{ code: "destructive-delete", message: "Deletes files or directories.", weight: 45 }], command);
+    assert.deepEqual(finding.sideEffects, ["filesystem"], command);
+  }
+});
+
+test("does not treat non-destructive rm near-misses as deletion", () => {
+  for (const command of ["rmdir empty", "rm -v artifact", "echo rm artifact"]) {
+    const finding = classifyCommand({ ...base, name: "inspect", command });
+    assert.equal(finding.risk, "unknown", command);
+    assert.deepEqual(finding.evidence, [], command);
+    assert.deepEqual(finding.sideEffects, [], command);
+  }
+});
+
+test("classifies privilege, ownership, and permission changes as dangerous", () => {
+  for (const command of ["sudo npm test", "chown root file", "chmod 600 file"]) {
+    const finding = classifyCommand({ ...base, command });
+    assert.equal(finding.risk, "dangerous", command);
+    assert.ok(finding.evidence.some((item) => item.code === "permissions"), command);
+    assert.deepEqual(finding.sideEffects, ["permissions"], command);
+  }
+});
+
 test("dangerous effects take precedence over verification terms", () => {
   for (const [command, evidenceCode] of [
     ["rm -rf dist && npm test", "destructive-delete"],
