@@ -40,7 +40,7 @@ For a fixture-backed walkthrough, see [`docs/tutorials/audit-agent-cli-scripts.m
 - `package.json` scripts across the repository.
 - `pnpm-workspace.yaml` workspace hints.
 - Makefile targets.
-- Markdown shell blocks fenced with backticks or tildes and labelled `bash`, `sh`, `shell`, `console`, or `zsh` (unlabelled fences are also scanned). Each independently executable line must begin with a supported command or an optional `$` prompt. Supported commands include package and task runners, Node and shell entry points, plus risk-relevant network, container, version-control, destructive, permission, deploy, and publish tools such as `curl`, `docker`, `git`, `rm`, `sudo`, and `vercel`.
+- Markdown shell blocks fenced with backticks or tildes and labelled `bash`, `sh`, `shell`, `console`, or `zsh` (unlabelled fences are also scanned). Shell lines ending in `\` are joined before classification, and commands may begin with standard environment assignments such as `CI=1 npm test`. Each independently executable command must otherwise begin with a supported command or an optional `$` prompt. Supported commands include package and task runners, Node and shell entry points, plus risk-relevant network, container, version-control, destructive, permission, deploy, and publish tools such as `curl`, `docker`, `git`, `rm`, `sudo`, and `vercel`.
 - Justfile recipes and Taskfile `cmds` entries written as scalar commands (`- npm test`) or inline mappings (`- cmd: npm test`).
 
 Make discovery recognizes ordinary named targets, including rules that list
