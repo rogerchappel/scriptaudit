@@ -2,7 +2,7 @@ import path from "node:path";
 import { findFilesByExtension, readText, toPosixRelative } from "../files.js";
 import type { CommandSource } from "../types.js";
 
-const COMMAND_PREFIX = /^(?:\$\s*)?(?:npm|pnpm|yarn|node|npx|bash|sh|make|just|task|deno|bun|tsx|curl|wget|docker(?:-compose)?|git|gh|rm|sudo|chmod|chown|vercel|flyctl|netlify|changeset)\b/;
+const COMMAND_PREFIX = /^(?:(?:[A-Za-z_][A-Za-z0-9_]*=(?:"[^"]*"|'[^']*'|[^\s]+))\s+)*(?:npm|pnpm|yarn|node|npx|bash|sh|make|just|task|deno|bun|tsx|curl|wget|docker(?:-compose)?|git|gh|rm|sudo|chmod|chown|vercel|flyctl|netlify|changeset)\b/;
 
 export async function discoverMarkdownCommands(root: string): Promise<CommandSource[]> {
   const files = await findFilesByExtension(root, ".md");
@@ -49,20 +49,25 @@ function extractCodeBlockCommands(relativeFile: string, text: string): CommandSo
       continue;
     }
 
-    const command = line.trim().replace(/^\$\s*/, "");
+    const sourceLine = index + 1;
+    let command = line.trim().replace(/^\$\s*/, "");
+    while (/\\$/.test(command) && index + 1 < lines.length) {
+      command = `${command.slice(0, -1).trimEnd()} ${lines[index + 1].trim()}`;
+      index += 1;
+    }
     if (!COMMAND_PREFIX.test(command)) {
       continue;
     }
 
     const basename = path.basename(relativeFile, ".md").toLowerCase();
     commands.push({
-      id: `${relativeFile}#code-${index + 1}`,
-      name: `${basename}:line-${index + 1}`,
+      id: `${relativeFile}#code-${sourceLine}`,
+      name: `${basename}:line-${sourceLine}`,
       command,
       kind: "markdown",
       location: {
         file: relativeFile,
-        line: index + 1
+        line: sourceLine
       }
     });
   }
