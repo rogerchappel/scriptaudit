@@ -7,6 +7,11 @@ format and uses semantic versioning when versioned releases are published.
 
 ## [Unreleased]
 
+### Fixed
+
+- Join shell continuations and recognize leading environment assignments when
+  discovering commands in Markdown fences.
+
 ### Added
 
 - Added verified npm trusted publication with provenance and reuse of the packed artifact in GitHub releases.
