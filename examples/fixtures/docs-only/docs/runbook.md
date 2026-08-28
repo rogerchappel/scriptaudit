@@ -19,3 +19,9 @@ docker compose up
 sudo chmod 600 .env
 npm test
 ```
+
+```bash
+rm \
+  -rf ./generated
+CI=1 npm test
+```

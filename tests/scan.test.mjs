@@ -43,6 +43,17 @@ test("scans risk-relevant commands in shell documentation", async () => {
   assert.equal(commands.get("npm test")?.risk, "safe");
 });
 
+test("joins shell continuations and recognizes environment assignments", async () => {
+  const report = await scanProject({ root: fixture("docs-only") });
+  const commands = new Map(report.commands.map((command) => [command.command, command]));
+
+  assert.equal(commands.get("rm -rf ./generated")?.risk, "dangerous");
+  assert.equal(commands.get("rm -rf ./generated")?.location.line, 24);
+  assert.equal(commands.get("CI=1 npm test")?.risk, "safe");
+  assert.equal(commands.get("CI=1 npm test")?.location.line, 26);
+  assert.equal(commands.has("rm \\"), false);
+});
+
 test("scans only executable Taskfile commands", async () => {
   const report = await scanProject({ root: fixture("taskfile-metadata") });
   const taskCommands = report.commands.filter((command) => command.kind === "taskfile");
