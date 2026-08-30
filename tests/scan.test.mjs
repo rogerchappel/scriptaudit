@@ -25,6 +25,20 @@ test("scans monorepo package scripts", async () => {
   assert.ok(report.commands.some((command) => command.kind === "npm-workspace"));
 });
 
+test("scans only the top-level pnpm packages list", async () => {
+  const report = await scanProject({ root: fixture("pnpm-lists") });
+  const workspaces = report.commands
+    .filter((command) => command.location.file === "pnpm-workspace.yaml")
+    .map(({ id, workspace }) => ({ id, workspace }));
+
+  assert.deepEqual(workspaces, [
+    { id: "pnpm-workspace.yaml#package-1", workspace: "apps/*" },
+    { id: "pnpm-workspace.yaml#package-2", workspace: "packages/*" }
+  ]);
+  assert.ok(!report.commands.some((command) => command.workspace === "esbuild"));
+  assert.ok(!report.commands.some((command) => command.workspace === "ignored/*"));
+});
+
 test("scans nested markdown docs", async () => {
   const report = await scanProject({ root: fixture("docs-only") });
   assert.ok(report.commands.some((command) => command.location.file === "docs/runbook.md"));
