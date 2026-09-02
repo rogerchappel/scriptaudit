@@ -7,6 +7,8 @@ format and uses semantic versioning when versioned releases are published.
 
 ## [Unreleased]
 
+- Pinned npm 11.5.1 preparation in release and dry-run workflows, with regression checks and release-readiness guidance for trusted publishing.
+
 ### Fixed
 
 - Join shell continuations and recognize leading environment assignments when
