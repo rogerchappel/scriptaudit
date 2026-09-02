@@ -19,9 +19,9 @@ Run `npm run package:smoke` when available and review the dry-run file list for 
 
 ## Automated publication
 
-The release workflow uses npm trusted publishing (GitHub Actions OIDC) and requires the npm package to trust this repository's `release.yml` workflow. A version tag packs the package once, publishes that exact tarball to npm with public access and provenance, and attaches the same file to the GitHub release.
+The release workflow uses npm trusted publishing (GitHub Actions OIDC) and requires the npm package to trust this repository's `release.yml` workflow. Both release workflows install and print npm `11.5.1` before installing dependencies; trusted publishing requires npm `11.5.1` or later. A version tag packs the package once, publishes that exact tarball to npm with public access and provenance, and attaches the same file to the GitHub release.
 
-The release dry-run workflow exercises the same artifact handoff on relevant pull requests: it packs once and runs `npm publish <tarball> --dry-run --access public`. `npm run release:workflow-check` guards both workflows against repacking or failing to reuse the artifact.
+The release dry-run workflow exercises the same npm preparation and artifact handoff on relevant pull requests: it packs once and runs `npm publish <tarball> --dry-run --access public`. `npm run release:workflow-check` guards both workflows against omitting or downgrading the pinned trusted-publishing npm version, repacking, or failing to reuse the artifact.
 
 ## Notes
 
