@@ -3,6 +3,28 @@ import { readFile } from "node:fs/promises";
 
 const release = await readFile(".github/workflows/release.yml", "utf8");
 const dryRun = await readFile(".github/workflows/release-dry-run.yml", "utf8");
+const trustedPublishingNpmVersion = "11.5.1";
+
+function assertTrustedPublishingNpm(workflow, name) {
+  const prepareIndex = workflow.indexOf("- name: Prepare trusted publishing npm");
+  const installIndex = workflow.indexOf("- name: Install dependencies");
+
+  assert.notEqual(prepareIndex, -1, `${name} must prepare npm for trusted publishing`);
+  assert.ok(
+    prepareIndex < installIndex,
+    `${name} must prepare trusted publishing npm before dependency installation`,
+  );
+  assert.match(
+    workflow,
+    new RegExp(`npm install --global npm@${trustedPublishingNpmVersion.replaceAll(".", "\\.")}`),
+    `${name} must pin npm ${trustedPublishingNpmVersion}`,
+  );
+  assert.match(
+    workflow.slice(prepareIndex, installIndex),
+    /npm --version/,
+    `${name} must print the effective npm version`,
+  );
+}
 
 function assertSinglePack(workflow, name) {
   assert.equal(
@@ -17,6 +39,8 @@ function assertSinglePack(workflow, name) {
 
 assertSinglePack(release, "release workflow");
 assertSinglePack(dryRun, "release dry-run workflow");
+assertTrustedPublishingNpm(release, "release workflow");
+assertTrustedPublishingNpm(dryRun, "release dry-run workflow");
 
 assert.match(
   release,
@@ -34,4 +58,6 @@ assert.match(
   "dry run must publish the packed artifact without repacking",
 );
 
-console.log("release workflows pack once and reuse the package artifact");
+console.log(
+  `release workflows prepare npm ${trustedPublishingNpmVersion}, pack once, and reuse the package artifact`,
+);
