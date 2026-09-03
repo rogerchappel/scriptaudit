@@ -4,7 +4,7 @@ import type { CommandSource } from "../types.js";
 
 interface PackageJson {
   name?: string;
-  scripts?: Record<string, string>;
+  scripts?: unknown;
 }
 
 export async function discoverPackageScripts(root: string): Promise<CommandSource[]> {
@@ -18,7 +18,13 @@ export async function discoverPackageScripts(root: string): Promise<CommandSourc
     }
 
     const relativeFile = toPosixRelative(root, filePath);
+    if (!isRecord(manifest.scripts)) {
+      throw new Error(`Invalid package scripts in ${relativeFile}: scripts must be an object of string values.`);
+    }
     for (const [name, command] of Object.entries(manifest.scripts).sort()) {
+      if (typeof command !== "string") {
+        throw new Error(`Invalid package script in ${relativeFile} at scripts.${name}: expected a string.`);
+      }
       commands.push({
         id: `${relativeFile}#scripts.${name}`,
         name,
@@ -33,4 +39,8 @@ export async function discoverPackageScripts(root: string): Promise<CommandSourc
   }
 
   return commands;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

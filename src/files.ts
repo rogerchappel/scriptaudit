@@ -26,7 +26,11 @@ export async function readJson<T>(filePath: string): Promise<T | null> {
   if (content === null) {
     return null;
   }
-  return JSON.parse(content) as T;
+  try {
+    return JSON.parse(content) as T;
+  } catch {
+    throw new Error(`Invalid JSON in ${filePath}.`);
+  }
 }
 
 export async function findFiles(root: string, names: Set<string>): Promise<string[]> {

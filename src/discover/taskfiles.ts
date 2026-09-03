@@ -52,7 +52,7 @@ function discoverTaskfile(file: string, text: string): CommandSource[] {
   try {
     document = parse(text);
   } catch {
-    return commands;
+    throw new Error(`Invalid Taskfile YAML in ${file}.`);
   }
   if (!isRecord(document) || !isRecord(document.tasks)) {
     return commands;
