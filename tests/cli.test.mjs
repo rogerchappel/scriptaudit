@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -87,6 +87,41 @@ test("CLI accepts an empty directory as a valid scan root", () => {
     total: 0
   });
 });
+
+test("CLI rejects non-string package scripts with a path-specific diagnostic", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "scriptaudit-invalid-scripts-"));
+  writeFileSync(path.join(root, "package.json"), '{"name":"probe","scripts":{"test":false}}');
+  const result = scan(root);
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, "");
+  assert.equal(result.stderr, "Invalid package script in package.json at scripts.test: expected a string.\n");
+});
+
+test("CLI rejects malformed package JSON with the discovered path", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "scriptaudit-invalid-json-"));
+  mkdirSync(path.join(root, "nested"));
+  writeFileSync(path.join(root, "nested", "package.json"), '{"scripts":');
+  const result = scan(root);
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, "");
+  assert.match(result.stderr, /Invalid JSON in .*nested[/\\]package\.json\./);
+});
+
+test("CLI rejects malformed Taskfile YAML instead of reporting zero commands", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "scriptaudit-invalid-taskfile-"));
+  writeFileSync(path.join(root, "Taskfile.yml"), "tasks:\n  release:\n    cmds: [\n      - npm publish\n");
+  const result = scan(root);
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, "");
+  assert.equal(result.stderr, "Invalid Taskfile YAML in Taskfile.yml.\n");
+});
+
+function scan(root) {
+  return spawnSync(process.execPath, [cli, "scan", root, "--format", "json"], {
+    cwd: repo,
+    encoding: "utf8"
+  });
+}
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
