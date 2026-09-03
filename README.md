@@ -86,6 +86,8 @@ An explicitly supplied `--config` path must exist. Config files are validated be
 
 ScriptAudit is a static heuristic tool, not a shell sandbox. It does not prove that a command is safe, and it does not replace maintainer judgment. Treat reports as a review appendix before running commands in an unfamiliar repo.
 
+Discovery is fail-closed for invalid command sources. Malformed `package.json` or Taskfile YAML and non-string `package.json` script values stop the scan with a nonzero exit and a path-specific diagnostic; they are never treated as a clean zero-command audit.
+
 ## Agent Workflow
 
 1. Run `scriptaudit scan . --out docs/SCRIPTS.md`.
