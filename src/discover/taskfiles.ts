@@ -61,7 +61,7 @@ function discoverTaskfile(file: string, text: string): CommandSource[] {
     if (!isRecord(task)) {
       continue;
     }
-    const body = taskCommands(task.cmds);
+    const body = taskCommands(task.cmds, file, name);
     if (body) {
       commands.push({
         id: `${file}#${name}`,
@@ -79,16 +79,29 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function taskCommands(value: unknown): string {
+function taskCommands(value: unknown, file: string, taskName: string): string {
+  if (value === undefined) return "";
   const entries = Array.isArray(value) ? value : [value];
   return entries
-    .map((entry) => {
-      if (typeof entry === "string") return entry.trim();
-      if (isRecord(entry) && typeof entry.cmd === "string") return entry.cmd.trim();
-      return "";
+    .map((entry, index) => {
+      const command = taskCommand(entry);
+      if (command) return command;
+      const entryPath = Array.isArray(value)
+        ? `tasks.${taskName}.cmds[${index}]`
+        : `tasks.${taskName}.cmds`;
+      throw new Error(
+        `Invalid Taskfile command in ${file} at ${entryPath}: expected a string, cmd string, or defer string.`
+      );
     })
-    .filter(Boolean)
     .join(" && ");
+}
+
+function taskCommand(entry: unknown): string {
+  if (typeof entry === "string") return entry.trim();
+  if (!isRecord(entry)) return "";
+  if (typeof entry.cmd === "string") return entry.cmd.trim();
+  if (typeof entry.defer === "string") return entry.defer.trim();
+  return "";
 }
 
 function taskLine(text: string, taskName: string): number | undefined {
