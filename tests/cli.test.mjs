@@ -116,6 +116,35 @@ test("CLI rejects malformed Taskfile YAML instead of reporting zero commands", (
   assert.equal(result.stderr, "Invalid Taskfile YAML in Taskfile.yml.\n");
 });
 
+test("CLI includes deferred Taskfile commands in task risk evidence", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "scriptaudit-taskfile-defer-"));
+  writeFileSync(
+    path.join(root, "Taskfile.yml"),
+    "version: '3'\ntasks:\n  deploy:\n    cmds:\n      - cmd: npm test\n      - defer: rm -rf build\n"
+  );
+  const result = scan(root);
+  assert.equal(result.status, 0, result.stderr);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.commands[0].command, "npm test && rm -rf build");
+  assert.equal(report.commands[0].risk, "dangerous");
+  assert.equal(report.summary.dangerous, 1);
+});
+
+test("CLI rejects malformed Taskfile command entries with a path-specific diagnostic", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "scriptaudit-invalid-task-command-"));
+  writeFileSync(
+    path.join(root, "Taskfile.yml"),
+    "version: '3'\ntasks:\n  deploy:\n    cmds:\n      - cmd: npm test\n      - defer: false\n"
+  );
+  const result = scan(root);
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, "");
+  assert.equal(
+    result.stderr,
+    "Invalid Taskfile command in Taskfile.yml at tasks.deploy.cmds[1]: expected a string, cmd string, or defer string.\n"
+  );
+});
+
 function scan(root) {
   return spawnSync(process.execPath, [cli, "scan", root, "--format", "json"], {
     cwd: repo,
