@@ -11,6 +11,8 @@ format and uses semantic versioning when versioned releases are published.
 
 ### Fixed
 
+- Include Taskfile deferred-command mappings in audit evidence and reject malformed command entries with path-specific diagnostics.
+
 - Join shell continuations and recognize leading environment assignments when
   discovering commands in Markdown fences.
 

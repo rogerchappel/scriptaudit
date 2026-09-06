@@ -41,7 +41,7 @@ For a fixture-backed walkthrough, see [`docs/tutorials/audit-agent-cli-scripts.m
 - `pnpm-workspace.yaml` workspace hints.
 - Makefile targets.
 - Markdown shell blocks fenced with backticks or tildes and labelled `bash`, `sh`, `shell`, `console`, or `zsh` (unlabelled fences are also scanned). Shell lines ending in `\` are joined before classification, and commands may begin with standard environment assignments such as `CI=1 npm test`. Each independently executable command must otherwise begin with a supported command or an optional `$` prompt. Supported commands include package and task runners, Node and shell entry points, plus risk-relevant network, container, version-control, destructive, permission, deploy, and publish tools such as `curl`, `docker`, `git`, `rm`, `sudo`, and `vercel`.
-- Justfile recipes and Taskfile `cmds` entries written as scalar commands (`- npm test`) or inline mappings (`- cmd: npm test`).
+- Justfile recipes and Taskfile `cmds` entries written as scalar commands (`- npm test`), command mappings (`- cmd: npm test`), or deferred-command mappings (`- defer: rm -rf build`). Deferred commands are included in the task's compound command and risk evidence.
 
 Make discovery recognizes ordinary named targets, including rules that list
 multiple targets; each target is reported at the shared rule location with the
@@ -86,7 +86,7 @@ An explicitly supplied `--config` path must exist. Config files are validated be
 
 ScriptAudit is a static heuristic tool, not a shell sandbox. It does not prove that a command is safe, and it does not replace maintainer judgment. Treat reports as a review appendix before running commands in an unfamiliar repo.
 
-Discovery is fail-closed for invalid command sources. Malformed `package.json` or Taskfile YAML and non-string `package.json` script values stop the scan with a nonzero exit and a path-specific diagnostic; they are never treated as a clean zero-command audit.
+Discovery is fail-closed for invalid command sources. Malformed `package.json` or Taskfile YAML, non-string `package.json` script values, and unsupported or malformed Taskfile `cmds` entries stop the scan with a nonzero exit and a path-specific diagnostic; they are never treated as a clean zero-command audit.
 
 ## Agent Workflow
 
