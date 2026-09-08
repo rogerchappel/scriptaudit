@@ -97,6 +97,23 @@ test("CLI rejects non-string package scripts with a path-specific diagnostic", (
   assert.equal(result.stderr, "Invalid package script in package.json at scripts.test: expected a string.\n");
 });
 
+test("CLI rejects a null package scripts container instead of reporting zero commands", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "scriptaudit-null-scripts-"));
+  writeFileSync(path.join(root, "package.json"), '{"name":"probe","scripts":null}');
+  const result = scan(root);
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, "");
+  assert.equal(result.stderr, "Invalid package scripts in package.json: scripts must be an object of string values.\n");
+});
+
+test("CLI accepts an absent package scripts container", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "scriptaudit-absent-scripts-"));
+  writeFileSync(path.join(root, "package.json"), '{"name":"probe"}');
+  const result = scan(root);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(JSON.parse(result.stdout).summary.total, 0);
+});
+
 test("CLI rejects malformed package JSON with the discovered path", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "scriptaudit-invalid-json-"));
   mkdirSync(path.join(root, "nested"));
@@ -143,6 +160,23 @@ test("CLI rejects malformed Taskfile command entries with a path-specific diagno
     result.stderr,
     "Invalid Taskfile command in Taskfile.yml at tasks.deploy.cmds[1]: expected a string, cmd string, or defer string.\n"
   );
+});
+
+test("CLI rejects a non-object Taskfile task instead of reporting zero commands", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "scriptaudit-invalid-task-"));
+  writeFileSync(path.join(root, "Taskfile.yml"), "version: '3'\ntasks:\n  broken: npm test\n");
+  const result = scan(root);
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, "");
+  assert.equal(result.stderr, "Invalid Taskfile task in Taskfile.yml at tasks.broken: expected an object.\n");
+});
+
+test("CLI accepts an absent Taskfile tasks container", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "scriptaudit-absent-tasks-"));
+  writeFileSync(path.join(root, "Taskfile.yml"), "version: '3'\n");
+  const result = scan(root);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(JSON.parse(result.stdout).summary.total, 0);
 });
 
 function scan(root) {
