@@ -13,7 +13,7 @@ export async function discoverPackageScripts(root: string): Promise<CommandSourc
 
   for (const filePath of packageFiles) {
     const manifest = await readJson<PackageJson>(filePath);
-    if (!manifest?.scripts) {
+    if (manifest?.scripts === undefined) {
       continue;
     }
 

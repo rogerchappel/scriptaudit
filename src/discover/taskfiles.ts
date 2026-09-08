@@ -54,12 +54,15 @@ function discoverTaskfile(file: string, text: string): CommandSource[] {
   } catch {
     throw new Error(`Invalid Taskfile YAML in ${file}.`);
   }
-  if (!isRecord(document) || !isRecord(document.tasks)) {
+  if (!isRecord(document) || document.tasks === undefined) {
     return commands;
+  }
+  if (!isRecord(document.tasks)) {
+    throw new Error(`Invalid Taskfile tasks in ${file}: tasks must be an object.`);
   }
   for (const [name, task] of Object.entries(document.tasks)) {
     if (!isRecord(task)) {
-      continue;
+      throw new Error(`Invalid Taskfile task in ${file} at tasks.${name}: expected an object.`);
     }
     const body = taskCommands(task.cmds, file, name);
     if (body) {
