@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { promises as fs } from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { Command } from "commander";
 import { scanProject } from "./core/audit.js";
@@ -8,11 +9,12 @@ import { renderReport, type OutputFormat } from "./render/index.js";
 import type { RiskLevel } from "./types.js";
 
 const program = new Command();
+const { version } = createRequire(import.meta.url)("../package.json") as { version: string };
 
 program
   .name("scriptaudit")
   .description("Audit local scripts and command docs without executing them.")
-  .version("0.1.0");
+  .version(version);
 
 program
   .command("scan")
