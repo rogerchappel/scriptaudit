@@ -23,6 +23,8 @@ The release workflow uses npm trusted publishing (GitHub Actions OIDC) and requi
 
 The release dry-run workflow exercises the same npm preparation and artifact handoff on relevant pull requests: it packs once and runs `npm publish <tarball> --dry-run --access public`. `npm run release:workflow-check` guards both workflows against omitting or downgrading the pinned trusted-publishing npm version, repacking, or failing to reuse the artifact.
 
+The CLI reads its version from `package.json`; there is no second version literal to update. After `npm version patch --no-git-tag-version`, `npm run release:check` verifies that the built CLI and the installed packed artifact both report the packed manifest version.
+
 ## Notes
 
 - Keep README examples aligned with the fixture-backed smoke command.
