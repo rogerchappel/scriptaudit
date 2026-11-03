@@ -15,6 +15,7 @@
     "dist",
     "docs",
     "examples",
+    "scripts/smoke.sh",
     "README.md",
     "LICENSE",
     "SECURITY.md",
