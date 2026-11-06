@@ -2,6 +2,12 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# CI runs smoke immediately after building; standalone callers may not have dist yet.
+if [[ ! -f "${ROOT}/dist/cli.js" ]]; then
+  npm --prefix "${ROOT}" run build
+fi
+
 TMP_DIR="${ROOT}/tmp/smoke"
 
 mkdir -p "${TMP_DIR}"
