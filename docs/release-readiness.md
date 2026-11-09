@@ -7,7 +7,7 @@ Use this checklist before cutting a release or asking for a release review.
 ```sh
 npm install
 npm run check
-npm run test
+npm test
 npm run smoke
 npm run package:smoke
 npm run release:check
