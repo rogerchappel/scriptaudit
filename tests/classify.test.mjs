@@ -48,6 +48,19 @@ test("classifies privilege, ownership, and permission changes as dangerous", () 
   }
 });
 
+test("deployment detection ignores incidental deploy tokens but keeps deployment commands dangerous", () => {
+  for (const command of ["echo deploy later", "npm run deploy", "the deployment process is documented"]) {
+    const finding = classifyCommand({ ...base, command });
+    assert.equal(finding.risk, "unknown", command);
+    assert.deepEqual(finding.evidence, [], command);
+  }
+  for (const command of ["deploy", "deploy production", "deploy app to staging", "vercel deploy"]) {
+    const finding = classifyCommand({ ...base, command });
+    assert.equal(finding.risk, "dangerous", command);
+    assert.ok(finding.evidence.some((item) => item.code === "deploy"), command);
+  }
+});
+
 test("dangerous effects take precedence over verification terms", () => {
   for (const [command, evidenceCode] of [
     ["rm -rf dist && npm test", "destructive-delete"],
