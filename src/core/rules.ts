@@ -8,7 +8,7 @@ export interface RuleMatch {
 
 const RULES: Array<{ pattern: RegExp; match: RuleMatch }> = [
   { pattern: /\brm\s+(?:[^\s;&|]+\s+)*-(?:[a-z]*[rf][a-z]*|-[a-z-]*(?:recursive|force)[a-z-]*)\b|\brimraf\b|\btrash\b/, match: evidence("destructive-delete", "Deletes files or directories.", 45, "filesystem") },
-  { pattern: /\bdeploy\b|\bvercel\b|\bflyctl\b|\bnetlify\b/, match: evidence("deploy", "Looks like a deployment command.", 50, "external-service", true) },
+  { pattern: /\b(?:vercel|flyctl|netlify)\b|(?:^|&&|\|\||;|\|)\s*(?:\w+=\S+\s+)*(?:\S+\/)*(?:deploy|deployment)\b(?=\s+(?:--?[\w-]+\s+)*(?:\S+\s+)*(?:to\s+)?(?:production|prod|staging|preview|https?:\/\/)|\s*$)/, match: evidence("deploy", "Looks like a deployment command.", 50, "external-service", true) },
   { pattern: /\bpublish\b|\bnpm\s+publish\b|\bchangeset\s+publish\b/, match: evidence("publish", "May publish an artifact.", 55, "registry", true) },
   { pattern: /\bcurl\b|\bwget\b|\bnc\b|\bssh\b/, match: evidence("network-tool", "Uses a network-capable tool.", 25, "network", true) },
   { pattern: /\bdocker\b|\bdocker-compose\b/, match: evidence("container", "May start containers or mutate local Docker state.", 20, "container") },
