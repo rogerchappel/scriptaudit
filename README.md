@@ -96,13 +96,26 @@ Discovery is fail-closed for invalid command sources. Malformed `package.json` o
 4. Ask for human approval before running `dangerous` commands.
 5. Keep generated reports in review artifacts when command choice matters.
 
-## Verify
+## Contributing and verification
+
+Use Node.js 20 or newer. From a fresh checkout, install the locked dependencies and run the same checks used in CI:
 
 ```bash
+npm ci
+npm run lint
 npm test
 npm run check
 npm run build
 npm run smoke
+npm run package:smoke
+npm run release:workflow-check
+```
+
+`npm test` builds the TypeScript sources before running the Node test suite. `npm run package:smoke` performs a dry-run package check; it does not publish. The workflow check validates release workflow configuration and does not create a release. CI runs these checks on pull requests and pushes to `main` using Node.js 22.
+
+For a broader local validation sequence, the repository also provides:
+
+```bash
 bash scripts/validate.sh
 ```
 
