@@ -1,0 +1,4 @@
+# YAML sequence and flow-style declaration
+packages: ["apps/*", '@scope/pkg', "packages/*"]
+ignored:
+  - esbuild
