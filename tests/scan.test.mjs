@@ -39,6 +39,16 @@ test("scans only the top-level pnpm packages list", async () => {
   assert.ok(!report.commands.some((command) => command.workspace === "ignored/*"));
 });
 
+test("scans quoted inline pnpm workspace package declarations only", async () => {
+  const report = await scanProject({ root: fixture("pnpm-syntax") });
+  const workspaces = report.commands
+    .filter((command) => command.location.file === "pnpm-workspace.yaml")
+    .map(({ workspace }) => workspace);
+
+  assert.deepEqual(workspaces, ["apps/*", "@scope/pkg", "packages/*"]);
+  assert.ok(!report.commands.some((command) => command.workspace === "esbuild"));
+});
+
 test("scans nested markdown docs", async () => {
   const report = await scanProject({ root: fixture("docs-only") });
   assert.ok(report.commands.some((command) => command.location.file === "docs/runbook.md"));

@@ -1,4 +1,5 @@
 import path from "node:path";
+import { parseDocument, isMap, isSeq, isScalar } from "yaml";
 import { exists, readText } from "../files.js";
 import type { CommandSource } from "../types.js";
 
@@ -13,25 +14,14 @@ export async function discoverWorkspaceHints(root: string): Promise<CommandSourc
     return [];
   }
 
-  const packages: string[] = [];
-  let packagesIndent: number | undefined;
-  for (const line of text.split(/\r?\n/)) {
-    const key = /^(\s*)packages\s*:\s*(?:#.*)?$/.exec(line);
-    if (key) {
-      packagesIndent = key[1].length;
-      continue;
-    }
-    if (packagesIndent === undefined || !line.trim() || /^\s*#/.test(line)) continue;
-
-    const indent = /^\s*/.exec(line)?.[0].length ?? 0;
-    if (indent <= packagesIndent) {
-      packagesIndent = undefined;
-      continue;
-    }
-    const item = /^\s*-\s+(?:'([^']*)'|"([^"]*)"|([^#]*?))\s*(?:#.*)?$/.exec(line);
-    const value = (item?.[1] ?? item?.[2] ?? item?.[3])?.trim();
-    if (value) packages.push(value);
-  }
+  const document = parseDocument(text);
+  if (!isMap(document.contents)) return [];
+  const packagesNode = document.contents.get("packages", true);
+  if (!isSeq(packagesNode)) return [];
+  const packages = packagesNode.items
+    .filter(isScalar)
+    .map((item) => item.value)
+    .filter((value): value is string => typeof value === "string" && value.length > 0);
 
   return packages.map((workspace, index) => ({
     id: `pnpm-workspace.yaml#package-${index + 1}`,
