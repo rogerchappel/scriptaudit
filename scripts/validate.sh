@@ -141,9 +141,9 @@ if [ -f "package.json" ]; then
   if package_manager="$(choose_package_manager)"; then
     note "using package manager: $package_manager"
 
-    # release:check composes test, check, build and smoke/package checks; do not
-    # invoke it alongside the individual scripts or repeat the expensive work.
-    for script_name in check lint test build; do
+    # Run the workflow contract independently without repeating the full
+    # release:check suite, which composes the other project checks.
+    for script_name in check lint test build release:workflow-check; do
       if package_script_exists "$script_name"; then
         run_check "package script: $script_name" run_package_script "$package_manager" "$script_name"
       fi
