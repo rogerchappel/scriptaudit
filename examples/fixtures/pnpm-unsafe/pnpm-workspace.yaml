@@ -1,0 +1,7 @@
+packages:
+  - 'apps/*'
+  - '@scope/pkg'
+  - 'apps/*; touch /tmp/pwned'
+  - '$(whoami)'
+  - 'apps/*`id`'
+  - 'packages/* && echo unsafe'

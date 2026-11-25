@@ -21,7 +21,8 @@ export async function discoverWorkspaceHints(root: string): Promise<CommandSourc
   const packages = packagesNode.items
     .filter(isScalar)
     .map((item) => item.value)
-    .filter((value): value is string => typeof value === "string" && value.length > 0);
+    .filter((value): value is string => typeof value === "string" && value.length > 0)
+    .filter(isSafeWorkspacePattern);
 
   return packages.map((workspace, index) => ({
     id: `pnpm-workspace.yaml#package-${index + 1}`,
@@ -33,4 +34,9 @@ export async function discoverWorkspaceHints(root: string): Promise<CommandSourc
       file: "pnpm-workspace.yaml"
     }
   }));
+}
+
+/** Keep pnpm package/glob filter syntax while excluding shell operators. */
+function isSafeWorkspacePattern(value: string): boolean {
+  return !/[\s;&|`$()<>\\\n\r]/.test(value);
 }
