@@ -14,7 +14,7 @@
 
 ## Follow-up Backlog
 
-- [ ] Add richer shell parsing for nested command substitutions and complex pipelines.
+- [x] Recognize tools in nested command substitutions and complex pipelines; full shell grammar, here-documents, and parameter-expansion parsing remain intentionally unsupported.
 - [ ] Support more task runners such as Turbo, Nx, and Moon with first-class parsers.
 - [ ] Add SARIF output for code scanning ingestion.
 - [ ] Add optional config schema validation and `scriptaudit config check`.
